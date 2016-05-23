@@ -12,7 +12,7 @@ class VoteForm(forms.Form):
         super(VoteForm, self).__init__(*args, **kwargs)
 
 
-class SecondVoteForm(VoteForm):
+class FirstVoteForm(VoteForm):
     options = forms.MultipleChoiceField()
 
 
