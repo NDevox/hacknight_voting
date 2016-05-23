@@ -1,4 +1,4 @@
-from django import forms, Valida
+from django import forms
 from django.forms import ValidationError
 
 from voting.models import HackNight
