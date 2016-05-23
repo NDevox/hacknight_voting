@@ -3,10 +3,22 @@ from django.forms import ValidationError
 
 from voting.models import HackNight
 from voting.models import Option
+from voting.views import get_current_hacknight
 
 class optionForm(forms.Form):
     options = Option
     fields = "__all__"
+
+
+def get_query(self):
+    hacknight = get_current_hacknight()
+
+    return hacknight.options.all()
+
+def get_top_query(self):
+    hacknight = get_current_hacknight()
+
+    return hacknight.options.all().order_by('-first_vote')[:3]
 
 
 class VoteForm(forms.Form):
@@ -14,9 +26,21 @@ class VoteForm(forms.Form):
         self.hacknight = HackNight.objects.get(pk=hacknight)
         super(VoteForm, self).__init__(*args, **kwargs)
 
+    def run_vote(self, option):
+
+        option = Option.objects.get(pk=option)
+
+        option.second_vote += 1
+
+        option.save()
+
 
 class FirstVoteForm(VoteForm):
-    options = forms.MultipleChoiceField()
+    options = forms.ModelMultipleChoiceField(queryset=get_query)
+
+    def __init__(self, *args, **kwargs):
+        super(FirstVoteForm, self).__init__(*args, **kwargs)
+
 
     def clean(self, *args, **kwargs):
         cleaned_data = super(FirstVoteForm, self).clean(*args, **kwargs)
@@ -27,9 +51,13 @@ class FirstVoteForm(VoteForm):
 
         return cleaned_data
 
+    def run_votes(self, options):
+        for option in options:
+            self.run_vote(option)
+
 
 class SecondVoteForm(VoteForm):
-    option = forms.ChoiceField()
+    option = forms.ModelChoiceField(queryset=get_top_query)
 
     def clean(self, *args, **kwargs):
         cleaned_data = super(FirstVoteForm, self).clean(*args, **kwargs)
