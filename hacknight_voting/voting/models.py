@@ -9,5 +9,6 @@ class Option(models.model):
 
 
 class HackNight(models.model):
+    date = models.DateField(auto_now=True)
     name = models.CharField(max_length=255)
     options = models.ManyToManyField(Option)
