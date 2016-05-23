@@ -41,7 +41,7 @@ class SecondVote(View):
         if form.is_valid():
             form.run_vote(form.cleaned_data['option'])
 
-        return redirect('voting:second_vote')
+        return redirect('voting:winner')
 
 
 class registerOption(View):
@@ -59,3 +59,12 @@ class registerOption(View):
            form = optionForm()
 
         return render(request, 'register_option.html', {'form': form})
+
+
+class Winner(View):
+    def get(self, request, *args, **kwargs):
+        hacknight = get_current_hacknight()
+
+        winner = hacknight.options.all().order_by('-second_vote')[0]
+
+        return render(request, 'winner.html', {'winner': winner})
