@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
 
-from voting.models import HackNight
+import datetime
+
+from voting.models import HackNight, Option
 from voting.forms import optionForm, FirstVoteForm, SecondVoteForm
 
 
@@ -13,13 +15,12 @@ class FirstVote(View):
 
     def get(self, request, *args, **kwargs):
         self.hacknight = get_current_hacknight()
-        options = self.hacknight.options.all()
-        context = {'options': options}
+        context = {'form': FirstVoteForm(self.hacknight.pk)}
         return render(request, 'vote1.html', context)
 
     def post(self, request, *args, **kwargs):
         self.hacknight = get_current_hacknight()
-        form  = FirstVoteForm(self.hacknight, request.POST)
+        form = FirstVoteForm(self.hacknight.pk, request.POST)
 
         if form.is_valid():
             form.run_votes(form.cleaned_data['options'])
@@ -30,13 +31,12 @@ class FirstVote(View):
 class SecondVote(View):
     def get(self, request, *args, **kwargs):
         self.hacknight = get_current_hacknight()
-        options = self.hacknight.options.all()
-        context = {'options': options}
+        context = {'form': SecondVoteForm(self.hacknight.pk)}
         return render(request, 'vote1.html', context)
 
     def post(self, request, *args, **kwargs):
         self.hacknight = get_current_hacknight()
-        form = SecondVoteForm(self.hacknight, request.POST)
+        form = SecondVoteForm(self.hacknight.pk, request.POST)
 
         if form.is_valid():
             form.run_vote(form.cleaned_data['option'])
@@ -48,6 +48,14 @@ class registerOption(View):
 
     def get(self, request, *args, **kwargs):
 
+        try:
+            hacknight = get_current_hacknight()
+
+            if hacknight.date < datetime.date.today():
+                hacknight = HackNight.objects.create(name='ANOTHER HACK NIGHT')
+        except HackNight.DoesNotExist:
+            hacknight = HackNight.objects.create(name='ANOTHER HACK NIGHT')
+
         form = optionForm()
 
         return render(request, 'register_option.html', {'form': form})
@@ -56,7 +64,10 @@ class registerOption(View):
 
         form = optionForm(request.POST)
         if form.is_valid():
-                print('cool')
+            option = Option.objects.create(**form.cleaned_data)
+            x = get_current_hacknight()
+            x.options.add(option)
+            x.save()
         return render(request, 'register_option.html', {'form': form})
 
 

@@ -2,8 +2,10 @@
 
 <body>
     <div class="container">
-        {% for option in options %}
-
-        {% endfor %}
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit">
+        </form>
     </div>
 </body>

@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+{% load staticfiles %}
+
 <body>
-<form action="/name/" method="post">
-    <label for="name">Hack Option: </label>
-    <input id="name" type="text" name="name">
-    <input type="submit" value="OK">
-</form>
+    <div class="container">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit">
+        </form>
+    </div>
 </body>
-</html>
