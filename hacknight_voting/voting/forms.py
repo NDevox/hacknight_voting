@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ValidationError
 
-from voting.models import HackNight
+from voting.models import HackNight, Option
 
 
 class optionForm(forms.Form):
@@ -12,6 +12,14 @@ class VoteForm(forms.Form):
     def __init__(self, hacknight, *args, **kwargs):
         self.hacknight = HackNight.objects.get(pk=hacknight)
         super(VoteForm, self).__init__(*args, **kwargs)
+
+    def run_vote(self, option):
+
+        option = Option.objects.get(pk=option)
+
+        option.second_vote += 1
+
+        option.save()
 
 
 class FirstVoteForm(VoteForm):
@@ -25,6 +33,10 @@ class FirstVoteForm(VoteForm):
         cleaned_data['hacknight'] = self.hacknight
 
         return cleaned_data
+
+    def run_votes(self, options):
+        for option in options:
+            self.run_vote(option)
 
 
 class SecondVoteForm(VoteForm):
