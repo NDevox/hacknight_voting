@@ -6,17 +6,19 @@ from voting.forms import optionForm, FirstVoteForm, SecondVoteForm
 
 
 def get_current_hacknight():
-    return Hack
+    return HackNight.objects.latest('date')
 
 class FirstVote(View):
 
     def get(self, request, *args, **kwargs):
+        self.hacknight = get_current_hacknight()
         options = self.hacknight.options.all()
         context = {'options': options}
         return render(request, 'vote1.html', context)
 
     def post(self, request, *args, **kwargs):
-        form  = FirstVoteForm(request.POST)
+        self.hacknight = get_current_hacknight()
+        form  = FirstVoteForm(self.hacknight, request.POST)
 
         if form.is_valid():
             form.run_votes()
@@ -26,12 +28,14 @@ class FirstVote(View):
 
 class SecondVote(View):
     def get(self, request, *args, **kwargs):
+        self.hacknight = get_current_hacknight()
         options = self.hacknight.options.all()
         context = {'options': options}
         return render(request, 'vote1.html', context)
 
     def post(self, request, *args, **kwargs):
-        form = SecondVoteForm(request.POST)
+        self.hacknight = get_current_hacknight()
+        form = SecondVoteForm(self.hacknight, request.POST)
 
         if form.is_valid():
             form.run_votes()
