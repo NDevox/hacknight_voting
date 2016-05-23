@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
-
+from .forms import optionForm
 
 class FirstVote(View):
 
@@ -16,3 +16,19 @@ class FirstVote(View):
             form.run_votes()
 
         return redirect('voting:second_vote')
+
+class registerOption(View):
+
+    def set_option(self, request):
+
+        if request.method == 'POST':
+
+            form = optionForm(request.POST)
+
+            if form.is_valid():
+               print('cool')
+
+        else:
+           form = optionForm()
+
+        return render(request, 'register_option.html', {'form': form})
