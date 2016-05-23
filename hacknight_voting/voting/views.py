@@ -46,18 +46,17 @@ class SecondVote(View):
 
 class registerOption(View):
 
-    def set_option(self, request):
+    def get(self, request, *args, **kwargs):
 
-        if request.method == 'POST':
+        form = optionForm()
 
-            form = optionForm(request.POST)
+        return render(request, 'register_option.html', {'form': form})
 
-            if form.is_valid():
+    def post(self, request, *args, **kwargs):
+
+        form = optionForm(request.POST)
+        if form.is_valid():
                 print('cool')
-
-        else:
-            form = optionForm()
-
         return render(request, 'register_option.html', {'form': form})
 
 
