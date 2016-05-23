@@ -53,9 +53,9 @@ class registerOption(View):
             form = optionForm(request.POST)
 
             if form.is_valid():
-               print('cool')
+                print('cool')
 
         else:
-           form = optionForm()
+            form = optionForm()
 
         return render(request, 'register_option.html', {'form': form})
